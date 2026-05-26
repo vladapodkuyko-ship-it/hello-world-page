@@ -1,0 +1,12 @@
+{
+  "name": "hello-world-page",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "@vercel/functions": "^2.2.13"
+  }
+}

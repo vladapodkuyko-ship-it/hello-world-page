@@ -4,13 +4,13 @@
 
 ## Що це
 
-Це простий статичний лендінг з одним основним текстом:
+Це простий лендінг з одним основним текстом:
 
 ```text
 Хелло Ворлд
 ```
 
-Сайт не використовує React, Next.js, Vite, бекенд, базу даних або API. Увесь лендінг знаходиться в одному HTML-файлі.
+Сайт не використовує React, Next.js, Vite, бекенд або базу даних. Основний лендінг знаходиться в одному HTML-файлі. Для Vercel додано `middleware.js`, який показує сторінку входу до того, як Vercel віддасть `index.html`, та `api/login.js`, який перевіряє пароль і ставить cookie-сесію.
 
 ## Де лежить локально
 
@@ -24,6 +24,18 @@
 
 ```text
 /Users/vladapodkuyko/Documents/New project/index.html
+```
+
+Vercel-перевірка пароля:
+
+```text
+/Users/vladapodkuyko/Documents/New project/middleware.js
+```
+
+Обробка форми входу:
+
+```text
+/Users/vladapodkuyko/Documents/New project/api/login.js
 ```
 
 Документація:
@@ -95,7 +107,14 @@ Production
 https://hello-world-page-peach.vercel.app/
 ```
 
-Для цього лендінгу environment variables не використовуються. Причина проста: сторінка статична і не має API-ключів, бази даних або окремих тестових/бойових налаштувань.
+Для доступу за паролем Vercel використовує environment variables:
+
+```text
+LANDING_PASSWORD_HASH
+LANDING_SESSION_SECRET
+```
+
+У GitHub пароль не зберігається відкритим текстом. У Vercel треба зберігати хеш пароля та секрет для cookie-сесії.
 
 Важливо: автоматичний GitHub to Vercel deploy ще не підключений, бо у Vercel-акаунті треба додати GitHub як login connection. Поточний Vercel deploy був зроблений вручну через Vercel CLI.
 
@@ -117,7 +136,7 @@ https://hello-world-page-peach.vercel.app/
 
 ## Як перевірити локально
 
-Найпростіший спосіб: відкрити `index.html` у браузері.
+Найпростіший спосіб: відкрити `index.html` у браузері. У цьому режимі працює клієнтська форма пароля.
 
 Або запустити локальний перегляд з папки проєкту:
 
@@ -130,6 +149,8 @@ python3 -m http.server 8000
 ```text
 http://localhost:8000/
 ```
+
+Важливо: локальна форма в `index.html` та GitHub Pages не є повноцінним захистом, бо браузер уже завантажує HTML-файл. Повноцінну перевірку до видачі сторінки робить Vercel через `middleware.js`.
 
 ## Як оновити GitHub
 

@@ -4,13 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Хелло Ворлд</title>
-    <meta name="description" content="Простий лендінг з текстом Хелло Ворлд.">
+    <meta name="description" content="Простий лендінг з доступом після введення пароля.">
     <style>
       :root {
         color-scheme: light;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background: #f7f8fb;
         color: #172033;
+        --border: #d9dfeb;
+        --muted: #5d6a80;
+        --panel: #ffffff;
+        --primary: #172033;
+        --primary-hover: #26324a;
+        --danger: #b42318;
       }
 
       * {
@@ -31,17 +37,182 @@
         text-align: center;
       }
 
+      body.is-locked main {
+        visibility: hidden;
+      }
+
       h1 {
         margin: 0;
         font-size: clamp(48px, 12vw, 112px);
         line-height: 0.95;
         letter-spacing: 0;
       }
+
+      .password-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: #f7f8fb;
+      }
+
+      .password-box {
+        width: min(100%, 360px);
+        padding: 24px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 18px 54px rgba(23, 32, 51, 0.12);
+      }
+
+      .password-box h2 {
+        margin: 0 0 18px;
+        font-size: 24px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      .password-form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .password-form label {
+        font-size: 14px;
+        font-weight: 650;
+        color: var(--muted);
+        text-align: left;
+      }
+
+      .password-form input {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0 12px;
+        font: inherit;
+        color: var(--primary);
+        background: #ffffff;
+        outline: none;
+      }
+
+      .password-form input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(23, 32, 51, 0.12);
+      }
+
+      .password-form button {
+        min-height: 46px;
+        border: 0;
+        border-radius: 6px;
+        font: inherit;
+        font-weight: 700;
+        color: #ffffff;
+        background: var(--primary);
+        cursor: pointer;
+      }
+
+      .password-form button:hover,
+      .password-form button:focus-visible {
+        background: var(--primary-hover);
+      }
+
+      .password-error {
+        min-height: 18px;
+        margin: 0;
+        font-size: 14px;
+        color: var(--danger);
+        text-align: left;
+      }
+
+      .password-screen[hidden] {
+        display: none;
+      }
     </style>
   </head>
-  <body>
+  <body class="is-locked">
+    <section class="password-screen" id="password-screen" aria-label="Вхід">
+      <div class="password-box">
+        <h2>Введіть пароль</h2>
+        <form class="password-form" id="password-form">
+          <label for="password-input">Пароль</label>
+          <input id="password-input" name="password" type="password" autocomplete="current-password" required>
+          <button type="submit">Увійти</button>
+          <p class="password-error" id="password-error" role="alert" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
     <main>
       <h1>Хелло Ворлд</h1>
     </main>
+    <script>
+      (() => {
+        const passwordHash = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
+        const storageKey = 'hello-world-page-password';
+        const clientCookieName = 'landing_client_unlocked';
+        const form = document.getElementById('password-form');
+        const input = document.getElementById('password-input');
+        const error = document.getElementById('password-error');
+        const screen = document.getElementById('password-screen');
+
+        const getStoredHash = () => {
+          try {
+            return window.localStorage.getItem(storageKey);
+          } catch {
+            return null;
+          }
+        };
+
+        const setStoredHash = (value) => {
+          try {
+            window.localStorage.setItem(storageKey, value);
+          } catch {
+            window.sessionStorage.setItem(storageKey, value);
+          }
+        };
+
+        const hasClientCookie = () => document.cookie
+          .split(';')
+          .map((item) => item.trim())
+          .some((item) => item === `${clientCookieName}=1`);
+
+        const unlock = () => {
+          document.body.classList.remove('is-locked');
+          screen.setAttribute('hidden', '');
+        };
+
+        const sha256 = async (value) => {
+          const bytes = new TextEncoder().encode(value);
+          const digest = await crypto.subtle.digest('SHA-256', bytes);
+          return [...new Uint8Array(digest)]
+            .map((byte) => byte.toString(16).padStart(2, '0'))
+            .join('');
+        };
+
+        if (getStoredHash() === passwordHash || hasClientCookie()) {
+          unlock();
+        } else {
+          input.focus();
+        }
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          error.textContent = '';
+
+          if (await sha256(input.value) === passwordHash) {
+            setStoredHash(passwordHash);
+            document.cookie = `${clientCookieName}=1; path=/; max-age=604800; SameSite=Lax`;
+            unlock();
+            return;
+          }
+
+          input.value = '';
+          input.focus();
+          error.textContent = 'Невірний пароль';
+        });
+      })();
+    </script>
   </body>
 </html>

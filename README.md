@@ -1,12 +1,12 @@
 # Hello World Page
 
-A tiny static Hello World page for GitHub Pages.
+A tiny Hello World landing page with password access on Vercel.
 
-Open `index.html` locally or publish the repository with GitHub Pages or Vercel.
+Open `index.html` locally for a basic browser password gate, or use the Vercel deployment for server-side password protection.
 
 Live deployments:
 
 - GitHub Pages: https://vladapodkuyko-ship-it.github.io/hello-world-page/
-- Vercel Production: https://hello-world-page-peach.vercel.app/
+- Vercel Production: https://hello-world-page-peach.vercel.app/ password-protected
 
 Project documentation: [docs/landing.md](docs/landing.md)
