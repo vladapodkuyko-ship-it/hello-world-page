@@ -8,3 +8,5 @@ Live deployments:
 
 - GitHub Pages: https://vladapodkuyko-ship-it.github.io/hello-world-page/
 - Vercel Production: https://hello-world-page-peach.vercel.app/
+
+Project documentation: [docs/landing.md](docs/landing.md)
